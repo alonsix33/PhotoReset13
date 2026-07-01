@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Creepster&family=Rubik+Wet+Paint&family=Permanent+Marker&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--tinta:#120E0E;--tinta2:#1B1514;--sangre:#D21F1F;--sangre2:#A81414;--hueso:#F2E9D4;--hueso-d:#D8CDB2;--veneno:#4BD44A;--brasa:#F0552A;}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#120E0E;background-image:radial-gradient(circle at 50% -10%,#1B1514 0%,#120E0E 62%);font-family:"Space Grotesk",sans-serif;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:28px 12px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:16px}
+.phone{width:344px;height:726px;background:var(--tinta);border-radius:42px;border:3px solid #000;position:relative;overflow:hidden;
+  box-shadow:0 2px 0 #000,0 30px 60px -20px rgba(0,0,0,.95),inset 0 0 0 2px #2a201f}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;animation:screenIn .34s ease both}
+.grain::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:40;opacity:.11;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+.halftone{background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1.6px);background-size:7px 7px}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:15px 24px 8px;font:700 12px "Space Grotesk";color:var(--hueso);position:relative;z-index:20;flex:none}
+.statusbar .dots{font-family:"Press Start 2P";font-size:7px;letter-spacing:1px}
+.pbody{flex:1;display:flex;flex-direction:column;position:relative;z-index:10;padding:8px 26px 26px;min-height:0}
+.t-anton{font-family:"Anton";font-weight:400;line-height:.92;text-transform:uppercase;letter-spacing:.01em}
+.t-creep{font-family:"Creepster"}
+.t-drip{font-family:"Rubik Wet Paint"}
+.t-marker{font-family:"Permanent Marker"}
+.t-pixel{font-family:"Press Start 2P";line-height:1.5}
+.btn{font-family:"Anton";text-transform:uppercase;letter-spacing:.03em;color:#fff;background:var(--sangre);border:3px solid #000;border-radius:5px;padding:17px 20px;text-align:center;cursor:pointer;box-shadow:0 5px 0 #000,0 5px 0 2px var(--sangre2);transition:transform .08s ease,box-shadow .08s ease;user-select:none;display:block;width:100%}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #000}
+.btn.gh{background:transparent;color:var(--hueso);box-shadow:none;border-color:#3a2e2c}
+.btn.gh:active{transform:translateY(2px)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.ph{position:relative;background:#0d0a0a;overflow:hidden;background-image:repeating-linear-gradient(48deg,#241a24 0 9px,#1c141c 9px 18px)}
+.ph .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 9px "Space Grotesk";letter-spacing:.14em;text-transform:uppercase;color:#4a3f3c}
+.ball8{border-radius:50%;background:#0a0a0a;border:2px solid #000;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.ball8 i{border-radius:50%;background:var(--hueso);color:#000;display:flex;align-items:center;justify-content:center;font:700 12px "Space Grotesk";font-style:normal}
+.seal{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid currentColor;font-family:"Creepster";transform:rotate(-9deg)}
+.pxheart{width:4px;height:4px;background:var(--sangre);box-shadow:8px 0,16px 0,-8px 0 0 0 var(--sangre),0 8px,8px 8px,16px 8px,-8px 8px,-16px 8px,24px 8px,0 16px,8px 16px,16px 16px,-8px 16px,-16px 16px,24px 16px,0 24px,8px 24px,-8px 24px,16px 24px,0 32px,8px 32px}
+.tag{display:inline-block;font:700 10px "Space Grotesk";letter-spacing:.14em;text-transform:uppercase;color:var(--brasa);border:1.5px solid var(--brasa);padding:3px 8px;border-radius:2px}
+.logoR{background-image:url("assets/reset-r-hueso.png");background-size:contain;background-repeat:no-repeat;background-position:center}
+.inp{background:#0d0a0a;border:2.5px solid #3a2e2c;border-radius:5px;color:var(--hueso);font-family:"Space Grotesk";font-size:16px;padding:16px;width:100%;outline:none}
+.inp:focus{border-color:var(--sangre)}
+.pbar{height:22px;border:2px solid #000;background:#0d0a0a;border-radius:3px;overflow:hidden}
+.pbar i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--sangre) 0 8px,var(--sangre2) 8px 16px);transition:width .28s ease}
+.cropwin{position:relative;overflow:hidden;background:#000;touch-action:none;cursor:grab;border-radius:2px}
+.cropwin:active{cursor:grabbing}
+.stk{position:absolute;z-index:6;pointer-events:none}
+/* print frame — bordes casi parejos, inferior chico */
+.pf{position:relative;background:#000;border-radius:3px;overflow:hidden;box-shadow:0 16px 34px -14px rgba(0,0,0,.9)}
+.pf .win{position:absolute;overflow:hidden;background:#000}
+.pf .band-t{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center}
+.pf .band-b{position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px}
+.link{background:none;border:none;color:#6a605c;font:500 11px "Space Grotesk";text-decoration:underline;cursor:pointer;padding:4px}
+.qrow{display:flex;gap:12px;padding:13px 16px;align-items:center;border-top:1px solid #221a19}
+.qbtn{font-family:"Anton";text-transform:uppercase;letter-spacing:.03em;border:2px solid #3a2e2c;background:transparent;color:var(--hueso);border-radius:3px;padding:7px 11px;font-size:13px;cursor:pointer}
+@keyframes screenIn{from{opacity:1;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:1;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes stamp{0%{opacity:1;transform:scale(1.12) rotate(-9deg)}100%{opacity:1;transform:scale(1) rotate(-9deg)}}
+@keyframes flick{0%,92%,100%{opacity:1}94%{opacity:.35}96%{opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+</style>
+</helmet>
+
+<div class="stage">
+  <div class="phone">
+
+    <!-- ===== PORTADA ===== -->
+    <sc-if value="{{isPortada}}" hint-placeholder-val="{{ true }}">
+    <div class="scr grain" key="portada">
+      <div class="halftone" style="position:absolute;inset:0;opacity:.6"></div>
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="stk ball8" style="top:70px;right:22px;width:44px;height:44px;animation:rise .5s .15s both"><i style="width:20px;height:20px">8</i></div>
+      <div class="stk" style="top:128px;left:20px;animation:rise .5s .5s both"><div class="pxheart" style="transform:scale(.8)"></div></div>
+      <div class="pbody" style="justify-content:center;text-align:center;align-items:center">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;animation:rise .5s .05s both">
+          <div class="logoR" style="width:26px;height:26px"></div>
+          <span class="t-anton" style="color:var(--hueso);font-size:13px;letter-spacing:.32em">RESET</span>
+        </div>
+        <div class="t-drip" style="color:var(--sangre);font-size:150px;line-height:.78;text-shadow:0 5px 0 #000;animation:rise .6s .15s both">13</div>
+        <div class="t-anton" style="color:var(--hueso);font-size:27px;margin-top:10px;animation:rise .5s .3s both">TRECE AÑOS</div>
+        <p style="color:#b7ada6;font-size:14px;line-height:1.45;margin:16px 8px 0;animation:rise .5s .45s both">Se vienen cositas.<br>Deja tu foto para la posteridad.</p>
+        <button class="btn" style="font-size:27px;margin-top:26px;animation:rise .5s .6s both" onClick="{{start}}">QUIERO IMPRIMIR</button>
+        <div style="margin-top:16px;font:400 12px 'Space Grotesk';color:#7a706c;animation:rise .5s .72s both">Tienes <span class="t-pixel" style="color:var(--veneno);font-size:10px">{{photosLeft}} FOTOS</span>, elígelas bien.</div>
+      </div>
+      <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:20">
+        <button class="link" onClick="{{staff}}">staff</button>
+        <button class="link" onClick="{{resetDemo}}">↺ reiniciar demo</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== ELEGIR FUENTE ===== -->
+    <sc-if value="{{isSource}}" hint-placeholder-val="{{ true }}">
+    <div class="scr grain" key="source">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="gap:14px">
+        <button class="link" style="align-self:flex-start" onClick="{{home}}">‹ inicio</button>
+        <div><span class="t-anton" style="color:var(--hueso);font-size:34px">TU FOTO,<br>TU LEYENDA</span></div>
+        <p style="color:#9a908a;font-size:13px;margin:-4px 0 4px">¿De dónde la sacamos?</p>
+        <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <label style="border:3px solid var(--sangre);border-radius:6px;padding:24px 20px;background:#160f0e;display:flex;align-items:center;gap:16px;box-shadow:0 5px 0 #000;cursor:pointer">
+            <div style="width:46px;height:38px;border:3px solid var(--hueso);border-radius:5px;position:relative;flex:none"><div style="position:absolute;width:14px;height:14px;border:3px solid var(--hueso);border-radius:50%;top:8px;left:12px"></div><div style="position:absolute;width:14px;height:6px;background:var(--hueso);top:-6px;left:12px;border-radius:3px 3px 0 0"></div></div>
+            <div><div class="t-anton" style="color:var(--hueso);font-size:24px">TOMAR FOTO</div><div style="font:400 11px 'Space Grotesk';color:#8a807a">abre la cámara</div></div>
+            <input type="file" accept="image/*" capture="environment" onChange="{{onFile}}" style="display:none">
+          </label>
+          <label style="border:3px solid #3a2e2c;border-radius:6px;padding:24px 20px;background:#160f0e;display:flex;align-items:center;gap:16px;cursor:pointer">
+            <div style="width:46px;height:38px;border:3px solid var(--hueso);border-radius:5px;position:relative;flex:none;overflow:hidden"><div style="position:absolute;width:14px;height:14px;border-radius:50%;background:var(--brasa);top:6px;left:6px"></div><div style="position:absolute;bottom:-2px;left:4px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:16px solid var(--hueso)"></div></div>
+            <div><div class="t-anton" style="color:var(--hueso);font-size:24px">SUBIR DE GALERÍA</div><div style="font:400 11px 'Space Grotesk';color:#8a807a">de tu rollo</div></div>
+            <input type="file" accept="image/*" onChange="{{onFile}}" style="display:none">
+          </label>
+        </div>
+        <div style="text-align:center;font:400 11px 'Space Grotesk';color:#6a605c">Sin filtros raros. Tú y tu cara nomás.</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== RECORTE ===== -->
+    <sc-if value="{{isCrop}}" hint-placeholder-val="{{ true }}">
+    <div class="scr grain" key="crop">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="gap:12px">
+        <div style="text-align:center"><div class="t-anton" style="color:var(--hueso);font-size:22px">ENCUADRA</div><p style="color:#9a908a;font-size:12px;margin:4px 10px 0">Arrastra y pellizca. Lo que ves es lo que sale.</p></div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+          <div class="cropwin" style="width:252px;height:378px" onPointerDown="{{onDown}}" onPointerMove="{{onMove}}" onPointerUp="{{onUp}}" onPointerCancel="{{onUp}}" onTouchStart="{{onTouchStart}}" onTouchMove="{{onTouchMove}}" onWheel="{{onWheel}}">
+            <img src="{{imgSrc}}" style="{{imgStyle}}" draggable="false">
+            <div style="position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(242,233,212,.8)"></div>
+            <div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.16) 1px,transparent 1px);background-size:33.33% 33.33%;opacity:.55"></div>
+            <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(0,0,0,.45),transparent 20%,transparent 80%,rgba(0,0,0,.6))"></div>
+            <div class="t-anton" style="position:absolute;top:6px;left:0;right:0;text-align:center;color:#fff;font-size:10px;letter-spacing:.3em;text-shadow:0 1px 2px #000;pointer-events:none">13 AÑOS</div>
+            <div class="t-anton" style="position:absolute;bottom:6px;left:0;right:0;text-align:center;color:#fff;font-size:11px;letter-spacing:.06em;text-shadow:0 1px 2px #000;pointer-events:none">{{nameUpper}}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="t-pixel" style="color:#6a605c;font-size:9px">–</span>
+          <input type="range" min="{{minZoom}}" max="{{maxZoom}}" step="0.01" value="{{zoom}}" onInput="{{onZoom}}" style="flex:1;accent-color:#D21F1F">
+          <span class="t-pixel" style="color:var(--hueso);font-size:9px">+</span>
+        </div>
+        <div class="t-pixel" style="color:#4a3f3c;font-size:7px;text-align:center">recorte → x:{{cap.x}} y:{{cap.y}} · {{cap.width}}×{{cap.height}}px</div>
+        <button class="btn" style="font-size:22px" onClick="{{toName}}">USAR ESTA FOTO</button>
+        <button class="btn gh" style="font-size:14px;padding:9px" onClick="{{home}}">Cambiar foto</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== NOMBRE ===== -->
+    <sc-if value="{{isName}}" hint-placeholder-val="{{ true }}">
+    <div class="scr grain" key="name">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <span class="stk seal" style="top:74px;right:24px;width:48px;height:48px;color:var(--sangre);font-size:22px">13</span>
+      <div class="pbody" style="gap:14px">
+        <button class="link" style="align-self:flex-start" onClick="{{backCrop}}">‹ encuadre</button>
+        <div style="margin-top:8px"><span class="t-anton" style="color:var(--hueso);font-size:32px">¿QUIÉN ERES?</span></div>
+        <p style="color:#9a908a;font-size:13px;margin:-4px 0 8px">Va impreso en tu foto y sirve para encontrarla en la mesa.</p>
+        <div style="position:relative">
+          <input class="inp" placeholder="Tu nombre o tu apodo" value="{{name}}" onInput="{{setName}}" maxlength="18">
+          <span class="t-marker" style="position:absolute;right:12px;top:-14px;color:var(--brasa);font-size:16px;transform:rotate(-6deg)">¡con estilo!</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font:400 11px 'Space Grotesk';color:#6a605c"><span>Opcional, pero recomendado.</span><span class="t-pixel" style="font-size:8px">{{nameLen}}/18</span></div>
+        <div style="flex:1"></div>
+        <div style="border:2px dashed #3a2e2c;border-radius:5px;padding:12px 14px;color:#8a807a;font-size:12px;line-height:1.4">Se imprime chiquito abajo del marco, en <span class="t-anton" style="color:var(--hueso);letter-spacing:.05em">MAYÚSCULAS</span>.</div>
+        <button class="btn" style="font-size:22px" onClick="{{toConfirm}}">SIGUIENTE</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== CONFIRMACIÓN ===== -->
+    <sc-if value="{{isConfirm}}" hint-placeholder-val="{{ true }}">
+    <div class="scr grain" key="confirm">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="gap:11px">
+        <div style="text-align:center"><span class="t-anton" style="color:var(--hueso);font-size:22px">ASÍ SE VA A IMPRIMIR</span></div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+          <div class="pf" style="{{frameOuter}}">
+            <div class="band-t" style="{{bandT}}"><span class="t-anton" style="color:#fff;letter-spacing:.32em;font-size:11px">13 AÑOS</span></div>
+            <div class="win" style="{{frameWin}}"><img src="{{imgSrc}}" style="{{previewImgStyle}}" draggable="false"></div>
+            <div class="band-b" style="{{bandB}}"><div class="logoR" style="width:13px;height:13px;flex:none"></div><span class="t-anton" style="color:#fff;font-size:13px;letter-spacing:.05em">{{nameUpper}}</span></div>
+            <div style="{{frameStk}}">13</div>
+          </div>
+        </div>
+        <sc-if value="{{lowRes}}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:8px;background:#1a0f08;border:1.5px solid var(--brasa);border-radius:4px;padding:9px 12px">
+            <span class="t-pixel" style="color:var(--brasa);font-size:9px">!</span>
+            <span style="font:400 11px 'Space Grotesk';color:#e8c3a8">Está media pixeleada, puede salir con poca calidad.</span>
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:8px;background:#160f0e;border:1.5px solid #3a2e2c;border-radius:4px;padding:9px 12px">
+          <span class="t-pixel" style="color:var(--brasa);font-size:9px">!</span>
+          <span style="font:400 11px 'Space Grotesk';color:#b7ada6">Esto usa <b style="color:var(--hueso)">1 de tus {{photosLeft}} fotos</b>. No hay vuelta.</span>
+        </div>
+        <button class="btn" style="font-size:22px" onClick="{{submit}}">ENVIAR A IMPRIMIR</button>
+        <button class="btn gh" style="font-size:15px;padding:10px" onClick="{{backCrop}}">Volver a encuadrar</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== ENVIANDO ===== -->
+    <sc-if value="{{isSending}}" hint-placeholder-val="{{ false }}">
+    <div class="scr grain" key="sending">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="justify-content:center;gap:0;text-align:center;align-items:center">
+        <div class="t-anton" style="color:var(--hueso);font-size:30px">MANDANDO<br>A LA COLA</div>
+        <p style="color:#8a807a;font-size:13px;margin:12px 0 22px">No cierres. Ya casi.</p>
+        <div class="pbar" style="width:100%"><i style="width:{{progressPct}}"></i></div>
+        <div class="t-pixel" style="color:var(--brasa);font-size:12px;margin-top:14px">{{progress}}%</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== ÉXITO ===== -->
+    <sc-if value="{{isSuccess}}" hint-placeholder-val="{{ false }}">
+    <div class="scr grain" key="success">
+      <div class="halftone" style="position:absolute;inset:0;opacity:.55"></div>
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="justify-content:center;align-items:center;text-align:center;gap:0">
+        <div class="seal" style="width:116px;height:116px;color:var(--veneno);border-width:4px;animation:stamp 1s .1s both">
+          <div style="display:flex;flex-direction:column;align-items:center"><span style="font-size:16px;letter-spacing:.1em">EN LA</span><span style="font-size:28px;line-height:.8">COLA</span></div>
+        </div>
+        <div class="t-anton" style="color:var(--hueso);font-size:26px;margin-top:16px;animation:rise .5s .5s both">¡LISTO!</div>
+        <p style="color:#b7ada6;font-size:13px;line-height:1.4;margin:8px 14px 0;animation:rise .5s .6s both">Así salió tu impresión. Recógela en la mesa.</p>
+        <img src="{{lastPrint}}" style="width:106px;margin-top:14px;border-radius:3px;box-shadow:0 10px 24px -8px #000;animation:rise .5s .7s both" alt="impresión">
+        <div style="margin-top:14px;border:2px solid #2a201f;border-radius:4px;padding:8px 16px;animation:rise .5s .8s both">{{leftLabel}}</div>
+        <div style="display:flex;gap:10px;margin-top:16px;animation:rise .5s .9s both">
+          <button class="btn" style="font-size:17px;width:auto;padding:12px 20px" onClick="{{again}}">{{againLabel}}</button>
+          <button class="btn gh" style="font-size:14px;width:auto;padding:12px 15px" onClick="{{downloadPrint}}">↓ PNG</button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== LÍMITE ===== -->
+    <sc-if value="{{isLimit}}" hint-placeholder-val="{{ false }}">
+    <div class="scr grain" key="limit">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="stk ball8" style="top:84px;left:26px;width:44px;height:44px"><i style="width:20px;height:20px">8</i></div>
+      <div class="pbody" style="justify-content:center;align-items:center;text-align:center">
+        <div class="t-pixel" style="color:var(--sangre);font-size:44px;line-height:1.2;animation:flick 3s infinite">0/2</div>
+        <div class="t-creep" style="color:var(--hueso);font-size:52px;line-height:.9;margin-top:14px">se acabó</div>
+        <div class="t-anton" style="color:var(--sangre);font-size:32px;margin-top:6px">VE POR UN TRAGO</div>
+        <p style="color:#b7ada6;font-size:14px;line-height:1.45;margin:16px 16px 0">Ya quemaste tus 2 fotos, crack.<br>Anda a la mesa a recogerlas.</p>
+        <button class="btn gh" style="font-size:14px;padding:10px 18px;margin-top:24px;width:auto" onClick="{{staff}}">Ver la cola</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== STAFF LOGIN ===== -->
+    <sc-if value="{{isStaff}}" hint-placeholder-val="{{ false }}">
+    <div class="scr grain" key="staff">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div class="pbody" style="justify-content:center;gap:16px">
+        <button class="link" style="align-self:flex-start;position:absolute;top:52px;left:26px" onClick="{{home}}">‹ salir</button>
+        <div style="text-align:center"><div class="logoR" style="width:34px;height:34px;margin:0 auto 10px"></div><div class="t-anton" style="color:var(--hueso);font-size:24px">PANEL DE COLA</div><div class="t-pixel" style="color:var(--sangre);font-size:9px;margin-top:8px">SOLO STAFF</div></div>
+        <input class="inp" style="text-align:center;letter-spacing:.3em;{{claveShake}}" type="password" placeholder="Clave del evento" value="{{clave}}" onInput="{{setClave}}">
+        <sc-if value="{{claveErr}}" hint-placeholder-val="{{ false }}"><div style="text-align:center;color:var(--sangre);font:500 12px 'Space Grotesk';margin-top:-8px">Clave incorrecta, pe.</div></sc-if>
+        <button class="btn" style="font-size:20px" onClick="{{login}}">ENTRAR</button>
+        <div class="t-pixel" style="color:#3a332f;font-size:7px;text-align:center;line-height:1.8">demo: clave 1313</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== COLA (OPERADOR) ===== -->
+    <sc-if value="{{isQueue}}" hint-placeholder-val="{{ false }}">
+    <div class="scr grain" key="queue">
+      <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+      <div style="padding:14px 18px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2a201f">
+        <div><div class="t-anton" style="color:var(--hueso);font-size:22px">COLA EN VIVO</div><button class="link" style="padding:2px 0" onClick="{{home}}">‹ inicio</button></div>
+        <div style="text-align:right"><div class="t-pixel" style="color:var(--veneno);font-size:9px">PAPEL {{paper}}/40</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">{{paperLeft}}</div></div>
+      </div>
+      <div style="flex:1;overflow:auto">
+        <sc-if value="{{queueEmpty}}" hint-placeholder-val="{{ true }}">
+          <div style="padding:60px 24px;text-align:center;color:#6a605c;font-size:13px;line-height:1.6">Cola vacía.<br>Manda una foto desde el flujo para verla acá.</div>
+        </sc-if>
+        <sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
+          <div class="qrow" style="{{q.rowStyle}}">
+            <div style="width:38px;height:57px;border-radius:2px;flex:none;overflow:hidden;background:#1c141c;position:relative"><img src="{{q.thumb}}" style="{{q.thumbStyle}}"></div>
+            <div style="flex:1;min-width:0"><div style="color:var(--hueso);font-weight:700;font-size:14px">{{q.name}}</div><div style="{{q.statusStyle}}">{{q.statusLabel}}</div></div>
+            <button class="qbtn" style="{{q.actStyle}}" onClick="{{q.action}}">{{q.actLabel}}</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+  <div style="font:500 11px 'Space Grotesk';color:#6a605c;text-align:center">Prototipo · 13 años Reset · toca todo, sube tu foto, encuádrala</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen:'portada', photosLeft:2,
+    imgSrc:null, nW:0, nH:0,
+    zoom:1, minZoom:1, maxZoom:4, offX:0, offY:0,
+    name:'', lowRes:false, frameColor:'#000', frameRed:false, stk:0,
+    queue:[], clave:'', claveErr:false,
+    progress:0, lastPrint:null
+  };
+  WIN = { w:252, h:378 };
+
+  componentDidMount(){
+    try{
+      const p = localStorage.getItem('reset13_photos');
+      const q = localStorage.getItem('reset13_queue');
+      this.setState({ photosLeft: p===null?2:parseInt(p,10), queue: q?JSON.parse(q):[] });
+    }catch(e){}
+    this._logo=new Image(); this._logo.src='assets/reset-r-hueso.png';
+  }
+  persist(extra){
+    const st = Object.assign({}, this.state, extra||{});
+    try{
+      localStorage.setItem('reset13_photos', String(st.photosLeft));
+      localStorage.setItem('reset13_queue', JSON.stringify(st.queue));
+    }catch(e){}
+  }
+
+  // ---- navigation
+  home(){ this.setState({screen:'portada'}); }
+  start(){ this.setState({ screen: this.state.photosLeft>0 ? 'source' : 'limit', imgSrc:null, name:'' }); }
+  backCrop(){ this.setState({screen:'crop'}); }
+  toName(){ this.setState({screen:'name'}); }
+  toConfirm(){ this.setState({screen:'confirm'}); }
+
+  // ---- file
+  onFile(e){
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      this._img = img;
+      const lowRes = img.naturalWidth < 900 || img.naturalHeight < 1200;
+      const frameRed = Math.random() < 0.4;
+      this.setState({
+        imgSrc:url, nW:img.naturalWidth, nH:img.naturalHeight,
+        zoom:1, minZoom:1, offX:0, offY:0, lowRes,
+        frameRed, frameColor: frameRed ? '#D21F1F' : '#000',
+        stk: Math.floor(Math.random()*3),
+        screen:'crop'
+      }, () => this.centerImage());
+    };
+    img.src = url;
+  }
+
+  // ---- crop math
+  dispScale(){ const {w,h}=this.WIN; return Math.max(w/this.state.nW, h/this.state.nH) * this.state.zoom; }
+  clamp(offX, offY){
+    const {w,h}=this.WIN; const s=this.dispScale();
+    const dw=this.state.nW*s, dh=this.state.nH*s;
+    return { offX: Math.min(0, Math.max(w-dw, offX)), offY: Math.min(0, Math.max(h-dh, offY)) };
+  }
+  centerImage(){
+    const {w,h}=this.WIN; const s=this.dispScale();
+    const dw=this.state.nW*s, dh=this.state.nH*s;
+    this.setState(this.clamp((w-dw)/2, (h-dh)/2));
+  }
+  setZoom(z){
+    z = Math.min(this.state.maxZoom, Math.max(this.state.minZoom, z));
+    const {w,h}=this.WIN;
+    const s0 = this.dispScale();
+    // zoom around center of window
+    const cx = (w/2 - this.state.offX)/s0, cy = (h/2 - this.state.offY)/s0;
+    this.setState({zoom:z}, () => {
+      const s1 = this.dispScale();
+      const c = this.clamp(w/2 - cx*s1, h/2 - cy*s1);
+      this.setState(c);
+    });
+  }
+  onDown(e){ try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(x){} this._drag={x:e.clientX,y:e.clientY,ox:this.state.offX,oy:this.state.offY}; }
+  onMove(e){ if(!this._drag) return; this.setState(this.clamp(this._drag.ox + (e.clientX-this._drag.x), this._drag.oy + (e.clientY-this._drag.y))); }
+  onUp(){ this._drag=null; }
+  _dist(t){ return Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY); }
+  onTouchStart(e){ if(e.touches.length===2){ this._pinch={d:this._dist(e.touches), z:this.state.zoom}; } }
+  onTouchMove(e){ if(e.touches.length===2 && this._pinch){ this.setZoom(this._pinch.z * (this._dist(e.touches)/this._pinch.d)); } }
+  onWheel(e){ this.setZoom(this.state.zoom * (e.deltaY<0?1.06:0.94)); }
+  cap(){ const s=this.dispScale(); const {w,h}=this.WIN; return { x:Math.max(0,Math.round(-this.state.offX/s)), y:Math.max(0,Math.round(-this.state.offY/s)), width:Math.round(w/s), height:Math.round(h/s) }; }
+
+  // ---- submit
+  submit(){
+    this.setState({screen:'sending', progress:0});
+    clearInterval(this._pi);
+    let p = 0;
+    this._pi = setInterval(() => {
+      p += 14 + Math.random()*20;
+      if(p >= 100){
+        clearInterval(this._pi);
+        const print = this.compose();
+        const item = { name:(this.state.name||'SIN NOMBRE').toUpperCase(), thumb:this.state.imgSrc,
+          crop:this.cap(), red:this.state.frameRed, t:Date.now(), status:'cola' };
+        const queue = this.state.queue.concat([item]);
+        const photosLeft = Math.max(0, this.state.photosLeft-1);
+        this.setState({progress:100, queue, photosLeft, screen:'success', lastPrint:print});
+        this.persist({queue, photosLeft});
+      } else {
+        this.setState({progress:Math.round(p)});
+      }
+    }, 300);
+  }
+  again(){ this.setState({ screen: this.state.photosLeft>0 ? 'source' : 'limit', imgSrc:null, name:'' }); }
+  resetDemo(){ const q=[]; this.setState({photosLeft:2, queue:q, screen:'portada'}); this.persist({photosLeft:2, queue:q}); }
+
+  // ---- staff
+  staff(){ this.setState({screen:'staff', clave:'', claveErr:false}); }
+  setClave(e){ this.setState({clave:e.target.value, claveErr:false}); }
+  login(){ if(this.state.clave.trim()==='1313'){ this.setState({screen:'queue'}); } else { this.setState({claveErr:true}); } }
+  skip(i){ const queue=this.state.queue.slice(); const [it]=queue.splice(i,1); it.status='cola'; queue.push(it); this.setState({queue}); this.persist({queue}); }
+  reprint(i){ const queue=this.state.queue.slice(); const copy=Object.assign({}, queue[i], {status:'cola', t:Date.now()}); queue.push(copy); this.setState({queue}); this.persist({queue}); }
+
+  // thumb crop style for queue rows (mini cover using stored crop)
+  thumbStyle(q){
+    if(!q.crop) return { width:'100%', height:'100%', objectFit:'cover' };
+    return { position:'absolute', left:0, top:0, width:'100%', height:'100%', objectFit:'cover',
+      objectPosition: (q.crop.x/(q.crop.x+q.crop.width||1)*100||50)+'% '+(q.crop.y/(q.crop.y+q.crop.height||1)*100||50)+'%' };
+  }
+
+  // ---- compone el PNG final 1200x1800 (foto + marco + nombre + stickers)
+  compose(){
+    const img=this._img; if(!img) return null;
+    const W=1200,H=1800, bs=90,bt=120,bb=150, wx=bs,wy=bt,ww=W-bs*2,wh=H-bt-bb;
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    const x=cv.getContext('2d');
+    x.fillStyle=this.state.frameRed?'#D21F1F':'#120E0E'; x.fillRect(0,0,W,H);
+    const cp=this.cap();
+    x.save(); x.beginPath(); x.rect(wx,wy,ww,wh); x.clip();
+    try{ x.drawImage(img, cp.x, cp.y, cp.width, cp.height, wx, wy, ww, wh); }catch(e){}
+    x.restore();
+    x.strokeStyle='rgba(255,255,255,0.18)'; x.lineWidth=4; x.strokeRect(wx-8,wy-8,ww+16,wh+16);
+    x.fillStyle='#F2E9D4'; x.textAlign='center'; x.textBaseline='middle';
+    try{x.letterSpacing='26px';}catch(e){}
+    x.font='400 76px "Anton", sans-serif';
+    x.fillText('13 AÑOS', W/2+13, bt/2+2);
+    try{x.letterSpacing='0px';}catch(e){}
+    const name=(this.state.name||'').toUpperCase();
+    x.font='400 60px "Anton", sans-serif';
+    const nameW = name?x.measureText(name).width:0;
+    const lw=58, gap=name?18:0, total=lw+gap+nameW, by=H-bb/2, cx=W/2-total/2;
+    if(this._logo && this._logo.complete) x.drawImage(this._logo, cx, by-lw/2, lw, lw);
+    if(name){ x.textAlign='left'; x.fillStyle='#F2E9D4'; x.fillText(name, cx+lw+gap, by+2); }
+    this.drawStickers(x,{wx,wy,ww,wh});
+    return cv.toDataURL('image/png');
+  }
+  drawStickers(x,g){
+    const sc = this.state.frameRed?'#F2E9D4':'#D21F1F';
+    const seal=(cx,cy,r)=>{x.save();x.translate(cx,cy);x.rotate(-9*Math.PI/180);x.strokeStyle=sc;x.lineWidth=6;x.beginPath();x.arc(0,0,r,0,7);x.stroke();x.fillStyle=sc;x.textAlign='center';x.textBaseline='middle';x.font='400 '+Math.round(r*1.25)+'px "Creepster", cursive';x.fillText('13',0,4);x.restore();};
+    const ball=(cx,cy,r)=>{x.save();x.fillStyle='#0a0a0a';x.beginPath();x.arc(cx,cy,r,0,7);x.fill();x.lineWidth=5;x.strokeStyle='#000';x.stroke();x.fillStyle='#F2E9D4';x.beginPath();x.arc(cx,cy,r*0.46,0,7);x.fill();x.fillStyle='#000';x.textAlign='center';x.textBaseline='middle';x.font='700 '+Math.round(r*0.5)+'px "Space Grotesk", sans-serif';x.fillText('8',cx,cy+2);x.restore();};
+    const heart=(cx,cy,cell)=>{const rows=["0110110","1111111","1111111","1111111","0111110","0011100","0001000"];x.save();x.fillStyle=sc;const w=rows[0].length,h=rows.length,ox=cx-w*cell/2,oy=cy-h*cell/2;for(let r=0;r<h;r++)for(let c=0;c<w;c++)if(rows[r][c]==='1')x.fillRect(ox+c*cell,oy+r*cell,cell-1,cell-1);x.restore();};
+    const v=this.state.stk;
+    if(v===0){ seal(g.wx+g.ww-24,g.wy+34,50); ball(g.wx+44,g.wy+g.wh-52,46); }
+    else if(v===1){ heart(g.wx+50,g.wy+50,10); ball(g.wx+g.ww-44,g.wy+44,44); }
+    else { seal(g.wx+44,g.wy+38,48); heart(g.wx+g.ww-50,g.wy+g.wh-50,10); }
+  }
+
+  renderVals(){
+    const s = this.state;
+    const scr = s.screen;
+    const dispS = s.nW ? this.dispScale() : 1;
+    const imgStyle = { position:'absolute', left:0, top:0, width:(s.nW*dispS)+'px', height:(s.nH*dispS)+'px',
+      transform:`translate(${s.offX}px,${s.offY}px)`, userSelect:'none', pointerEvents:'none', willChange:'transform', maxWidth:'none' };
+
+    // preview frame geometry (bordes casi parejos, inferior chico)
+    const PW = 152, PH = 228;        // ventana de preview (2:3)
+    const bT = 22, bS = 16, bB = 30; // bordes: top, lados, bottom
+    const k = PW / this.WIN.w;
+    const previewImgStyle = { position:'absolute', left:0, top:0, width:(s.nW*dispS*k)+'px', height:(s.nH*dispS*k)+'px',
+      transform:`translate(${s.offX*k}px,${s.offY*k}px)`, userSelect:'none', maxWidth:'none' };
+    const frameOuter = `width:${PW+bS*2}px;height:${PH+bT+bB}px;background:${s.frameColor}`;
+    const frameWin = `top:${bT}px;left:${bS}px;right:${bS}px;bottom:${bB}px`;
+    const bandT = `height:${bT}px`;
+    const bandB = `height:${bB}px`;
+    // random sticker on frame
+    const stkCol = s.frameRed ? '#fff' : 'var(--sangre)';
+    const stkVariants = [
+      `position:absolute;top:2px;right:6px;width:26px;height:26px;border-radius:50%;border:2px solid ${stkCol};color:${stkCol};font-family:Creepster;display:flex;align-items:center;justify-content:center;font-size:12px;transform:rotate(-9deg);content:''`,
+      `position:absolute;top:3px;left:7px;width:24px;height:24px;border-radius:50%;background:#0a0a0a;border:2px solid #000`,
+      `position:absolute;bottom:${bB+6}px;right:8px;width:22px;height:22px`
+    ];
+    // Use a child element for sticker to allow text/shape; simplest: seal "13"
+    const frameStk = `position:absolute;top:2px;right:6px;width:26px;height:26px;border-radius:50%;border:2px solid ${stkCol};color:${stkCol};display:flex;align-items:center;justify-content:center;font-family:Creepster;font-size:13px;transform:rotate(-9deg)`;
+
+    const leftLabel = s.photosLeft <= 0
+      ? React.createElement('span', null, 'Te quedan ', React.createElement('span',{className:'t-pixel',style:{color:'#F0552A',fontSize:'13px'}},'0 FOTOS'))
+      : React.createElement('span', null, 'Te queda ', React.createElement('span',{className:'t-pixel',style:{color:'#4BD44A',fontSize:'13px'}}, s.photosLeft+(s.photosLeft===1?' FOTO':' FOTOS')));
+
+    // queue view models
+    const paper = Math.max(0, 40 - s.queue.length);
+    const queueVM = s.queue.map((q, i) => {
+      const printing = i===0;
+      return {
+        name: q.name,
+        thumb: q.thumb,
+        thumbStyle: this.thumbStyle(q),
+        rowStyle: printing ? 'background:#170f0e;border-left:3px solid #F0552A' : '',
+        statusLabel: printing ? 'IMPRIMIENDO…' : ('en cola · #'+(i+1)),
+        statusStyle: printing ? 'color:#F0552A;font-family:"Press Start 2P";font-size:8px;margin-top:3px' : 'color:#8a807a;font:400 10px "Space Grotesk";margin-top:3px',
+        actLabel: printing ? 'saltar' : 'saltar',
+        actStyle: '',
+        action: () => this.skip(i)
+      };
+    });
+
+    return {
+      isPortada: scr==='portada', isSource: scr==='source', isCrop: scr==='crop', isName: scr==='name',
+      isConfirm: scr==='confirm', isSending: scr==='sending', isSuccess: scr==='success',
+      isLimit: scr==='limit', isStaff: scr==='staff', isQueue: scr==='queue',
+      photosLeft: s.photosLeft,
+      imgSrc: s.imgSrc, imgStyle, previewImgStyle,
+      minZoom: s.minZoom, maxZoom: s.maxZoom, zoom: s.zoom,
+      cap: this.cap(),
+      name: s.name, nameLen: s.name.length, nameUpper: (s.name||'TU APODO').toUpperCase(),
+      lowRes: s.lowRes,
+      frameOuter, frameWin, bandT, bandB, frameStk,
+      progress: s.progress, progressPct: s.progress+'%',
+      leftLabel,
+      againLabel: s.photosLeft>0 ? 'MANDAR OTRA' : 'VER LA COLA',
+      clave: s.clave, claveErr: s.claveErr, claveShake: s.claveErr ? 'animation:shake .4s' : '',
+      queue: queueVM, queueEmpty: s.queue.length===0, paper, paperLeft: 'quedan '+paper+' hojas',
+      // handlers
+      start:()=>this.start(), home:()=>this.home(), staff:()=>this.staff(), resetDemo:()=>this.resetDemo(),
+      onFile:(e)=>this.onFile(e),
+      onDown:(e)=>this.onDown(e), onMove:(e)=>this.onMove(e), onUp:()=>this.onUp(),
+      onTouchStart:(e)=>this.onTouchStart(e), onTouchMove:(e)=>this.onTouchMove(e), onWheel:(e)=>this.onWheel(e),
+      onZoom:(e)=>this.setZoom(parseFloat(e.target.value)),
+      toName:()=>this.toName(), backCrop:()=>this.backCrop(), toConfirm:()=>this.toConfirm(),
+      setName:(e)=>this.setState({name:e.target.value.slice(0,18)}),
+      submit:()=>this.submit(), again:()=>this.again(),
+      lastPrint: s.lastPrint, downloadPrint:()=>{ if(!this.state.lastPrint)return; const a=document.createElement('a'); a.href=this.state.lastPrint; a.download='reset13-impresion.png'; a.click(); },
+      setClave:(e)=>this.setClave(e), login:()=>this.login()
+    };
+  }
+}
+</script>
+</body>
+</html>

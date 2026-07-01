@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Creepster&family=Rubik+Wet+Paint&family=Permanent+Marker&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#120E0E; --tinta2:#1B1514;
+  --sangre:#D21F1F; --sangre2:#A81414;
+  --hueso:#F2E9D4; --hueso-d:#D8CDB2;
+  --veneno:#4BD44A; --brasa:#F0552A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#0B0808;font-family:"Space Grotesk",sans-serif;
+  background-image:radial-gradient(circle at 50% 0%, #1a1211 0%, #0B0808 60%);}
+
+/* ---- canvas scaffold ---- */
+.dv-turn{padding:56px 60px 64px;scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:12px;margin:0 0 8px}
+.dv-tid{font:700 11px "Space Grotesk",monospace;padding:4px 9px;background:var(--sangre);color:#fff;border-radius:2px;text-decoration:none;letter-spacing:.05em}
+.dv-tname{font:400 13px/1.3 "Space Grotesk",sans-serif;color:var(--hueso-d)}
+.dv-sub{font:400 13px/1.5 "Space Grotesk";color:#8a807a;max-width:620px;margin:0 0 34px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:40px 34px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.dv-olabel{display:flex;align-items:center;gap:9px;font:500 12px/1.3 "Space Grotesk";color:#9a908a}
+.dv-oid{font:700 10.5px "Space Grotesk",monospace;padding:3px 7px;background:#241b1a;color:var(--hueso-d);border-radius:2px;text-decoration:none;letter-spacing:.04em}
+.dv-opt:target .dv-oid{background:var(--veneno);color:#0B0808}
+.dv-next{margin:30px 0 0;font:13px/1.7 "Space Grotesk";color:#8a807a;max-width:760px}
+.dv-next a{color:var(--hueso)}
+.dv-secdiv{width:100%;height:1px;background:linear-gradient(90deg,transparent,#2a201f 20%,#2a201f 80%,transparent);margin:6px 0 2px}
+.dv-sechd{font:400 12px "Space Grotesk";letter-spacing:.32em;text-transform:uppercase;color:var(--sangre);margin:2px 0 -4px}
+
+/* ---- phone ---- */
+.phone{width:322px;height:668px;background:var(--tinta);border-radius:38px;
+  border:3px solid #000;position:relative;overflow:hidden;
+  box-shadow:0 2px 0 #000, 0 24px 50px -18px rgba(0,0,0,.9), inset 0 0 0 2px #2a201f;}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+.grain::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:40;opacity:.5;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+.halftone{background-image:radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1.6px);background-size:7px 7px}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 8px;
+  font:700 12px "Space Grotesk";color:var(--hueso);position:relative;z-index:20;flex:none}
+.statusbar .dots{font-family:"Press Start 2P";font-size:7px;letter-spacing:1px}
+.pbody{flex:1;display:flex;flex-direction:column;position:relative;z-index:10;padding:6px 24px 26px;min-height:0}
+
+/* type roles */
+.t-anton{font-family:"Anton";font-weight:400;line-height:.92;text-transform:uppercase;letter-spacing:.01em}
+.t-creep{font-family:"Creepster";letter-spacing:.02em}
+.t-drip{font-family:"Rubik Wet Paint"}
+.t-marker{font-family:"Permanent Marker"}
+.t-pixel{font-family:"Press Start 2P";line-height:1.5}
+
+/* buttons */
+.btn{font-family:"Anton";text-transform:uppercase;letter-spacing:.03em;color:#fff;background:var(--sangre);
+  border:3px solid #000;border-radius:4px;padding:18px 20px;text-align:center;cursor:pointer;
+  box-shadow:0 5px 0 #000, 0 5px 0 2px var(--sangre2);transition:transform .08s ease, box-shadow .08s ease;user-select:none}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #000}
+.btn.gh{background:transparent;color:var(--hueso);box-shadow:none;border-color:#3a2e2c}
+.btn.gh:active{transform:translateY(2px)}
+
+/* photo placeholder */
+.ph{position:relative;background:#0d0a0a;overflow:hidden;
+  background-image:repeating-linear-gradient(48deg,#171110 0 9px,#120c0b 9px 18px)}
+.ph .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font:400 9px "Space Grotesk",monospace;letter-spacing:.14em;text-transform:uppercase;color:#4a3f3c}
+.ph.face{background-image:repeating-linear-gradient(48deg,#241a24 0 9px,#1c141c 9px 18px)}
+
+/* stickers */
+.stk{position:absolute;z-index:5;pointer-events:none}
+.ball8{width:44px;height:44px;border-radius:50%;background:#0a0a0a;border:2px solid #000;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.ball8 i{width:20px;height:20px;border-radius:50%;background:var(--hueso);color:#000;
+  display:flex;align-items:center;justify-content:center;font:700 12px "Space Grotesk";font-style:normal}
+.seal{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  border:2px solid currentColor;font-family:"Creepster";transform:rotate(-9deg)}
+.ribbon{display:inline-block;background:var(--sangre);color:#fff;font-family:"Anton";text-transform:uppercase;
+  padding:5px 16px;letter-spacing:.06em;position:relative;border:2px solid #000}
+.pxheart{width:4px;height:4px;background:var(--sangre);
+  box-shadow:8px 0,16px 0, -8px 0 0 0 var(--sangre),
+  0 8px,8px 8px,16px 8px,-8px 8px,-16px 8px,24px 8px,
+  0 16px,8px 16px,16px 16px,-8px 16px,-16px 16px,24px 16px,
+  0 24px,8px 24px,-8px 24px,16px 24px,
+  0 32px,8px 32px}
+.tag{display:inline-block;font:700 10px "Space Grotesk";letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brasa);border:1.5px solid var(--brasa);padding:3px 8px;border-radius:2px}
+
+/* R logo mask (tint the black png) */
+.logoR{background-image:url("assets/reset-r-hueso.png")!important;background-size:contain;background-repeat:no-repeat;background-position:center}
+
+/* input */
+.inp{background:#0d0a0a;border:2.5px solid #3a2e2c;border-radius:4px;color:var(--hueso);
+  font-family:"Space Grotesk";font-size:15px;padding:16px 16px;width:100%;outline:none}
+.inp:focus{border-color:var(--sangre)}
+
+/* reveal */
+@keyframes rise{from{opacity:1;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes flick{0%,92%,100%{opacity:1}94%{opacity:.4}96%{opacity:1}}
+@keyframes stamp{0%{opacity:1;transform:scale(1.15) rotate(-9deg)}100%{opacity:1;transform:scale(1) rotate(-9deg)}}
+@keyframes barfill{from{width:8%}to{width:64%}}
+
+/* progress */
+.pbar{height:20px;border:2px solid #000;background:#0d0a0a;border-radius:2px;overflow:hidden;position:relative}
+.pbar i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--sangre) 0 8px,var(--sangre2) 8px 16px);animation:barfill 2.4s ease-in-out infinite alternate}
+
+/* print frame */
+.pframe{width:300px;aspect-ratio:2/3;background:#000;position:relative;border-radius:3px;
+  box-shadow:0 20px 46px -16px rgba(0,0,0,.9);overflow:hidden}
+.pframe .win{position:absolute;inset:26px 20px 60px;overflow:hidden}
+.pframe .fr-top{position:absolute;top:0;left:0;right:0;height:26px;display:flex;align-items:center;justify-content:center}
+.pframe .fr-bot{position:absolute;bottom:0;left:0;right:0;height:60px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Vitrina — sistema + flujo público + panel + marco</span></div>
+  <p class="dv-sub">Una sola dirección clavada: tinta casi negra, rojo sangre mandando, hueso y acentos tóxicos con cuentagotas. Textura de grano y semitono en todo. Mobile-first a 322px. Referéncialas por id en el chat (ej. <a class="dv-oid" href="#1e">1e</a>).</p>
+
+  <div class="dv-opts">
+
+    <!-- ===================== SISTEMA / TOKENS ===================== -->
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Sistema de diseño · tokens</div>
+      <div style="width:560px;background:var(--tinta);border:3px solid #000;border-radius:10px;padding:30px 30px 34px;position:relative;overflow:hidden" class="grain">
+        <div class="halftone" style="position:absolute;inset:0;opacity:.5"></div>
+        <div style="position:relative;z-index:2">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+            <div class="logoR" style="width:38px;height:38px"></div>
+            <div class="t-drip" style="color:var(--sangre);font-size:54px;line-height:1">13</div>
+          </div>
+          <div class="t-anton" style="color:var(--hueso);font-size:15px;letter-spacing:.28em">13 AÑOS · RESET</div>
+
+          <div style="height:1px;background:#2a201f;margin:22px 0"></div>
+
+          <!-- palette -->
+          <div style="font:700 10px 'Space Grotesk';letter-spacing:.24em;color:var(--sangre);text-transform:uppercase;margin-bottom:12px">Paleta</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:26px">
+            <div><div style="height:52px;background:#120E0E;border:2px solid #000;border-radius:3px"></div><div style="font:700 10px 'Space Grotesk';color:var(--hueso);margin-top:5px">tinta</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">#120E0E</div></div>
+            <div><div style="height:52px;background:var(--sangre);border:2px solid #000;border-radius:3px"></div><div style="font:700 10px 'Space Grotesk';color:var(--hueso);margin-top:5px">sangre</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">#D21F1F</div></div>
+            <div><div style="height:52px;background:var(--hueso);border:2px solid #000;border-radius:3px"></div><div style="font:700 10px 'Space Grotesk';color:var(--hueso);margin-top:5px">hueso</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">#F2E9D4</div></div>
+            <div><div style="height:52px;background:var(--veneno);border:2px solid #000;border-radius:3px"></div><div style="font:700 10px 'Space Grotesk';color:var(--hueso);margin-top:5px">veneno</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">#4BD44A</div></div>
+            <div><div style="height:52px;background:var(--brasa);border:2px solid #000;border-radius:3px"></div><div style="font:700 10px 'Space Grotesk';color:var(--hueso);margin-top:5px">brasa</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">#F0552A</div></div>
+          </div>
+
+          <!-- type -->
+          <div style="font:700 10px 'Space Grotesk';letter-spacing:.24em;color:var(--sangre);text-transform:uppercase;margin-bottom:14px">Tipografía</div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:26px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span class="t-anton" style="color:var(--hueso);font-size:34px">QUIERO IMPRIMIR</span><span style="font:400 10px 'Space Grotesk';color:#6a605c">Anton · impacto</span></div>
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="color:var(--hueso);font-size:16px">Arrastra y pellizca. Lo que ves es lo que sale.</span><span style="font:400 10px 'Space Grotesk';color:#6a605c">Space Grotesk · cuerpo</span></div>
+            <div style="display:flex;align-items:baseline;gap:14px"><span class="t-creep" style="color:var(--sangre);font-size:30px">se vienen cositas</span><span style="font:400 10px 'Space Grotesk';color:#6a605c">Creepster · horror</span></div>
+            <div style="display:flex;align-items:baseline;gap:14px"><span class="t-marker" style="color:var(--hueso);font-size:20px">le falta ají</span><span style="font:400 10px 'Space Grotesk';color:#6a605c">Permanent Marker · plumón</span></div>
+            <div style="display:flex;align-items:baseline;gap:14px"><span class="t-pixel" style="color:var(--veneno);font-size:13px">2 FOTOS</span><span style="font:400 10px 'Space Grotesk';color:#6a605c">Press Start 2P · pixel</span></div>
+          </div>
+
+          <!-- stickers -->
+          <div style="font:700 10px 'Space Grotesk';letter-spacing:.24em;color:var(--sangre);text-transform:uppercase;margin-bottom:14px">Stickers</div>
+          <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+            <div class="ball8"><i>8</i></div>
+            <span class="seal" style="width:46px;height:46px;color:var(--brasa);font-size:22px">13</span>
+            <span class="ribbon" style="font-size:13px">RESET</span>
+            <div style="width:40px;height:44px;position:relative"><div class="pxheart" style="position:absolute;top:2px;left:8px;transform:scale(.9)"></div></div>
+            <span class="tag">papel 30/40</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== FLUJO PÚBLICO ===================== -->
+    <div class="dv-opt" id="1b" style="max-width:1420px">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Flujo público — portada → éxito (+ estados)</div>
+      <div class="dv-opts" style="gap:26px">
+
+        <!-- 1. PORTADA -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="halftone" style="position:absolute;inset:0;opacity:.6"></div>
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <!-- border stickers -->
+            <div class="stk ball8" style="top:64px;right:20px"><i>8</i></div>
+            <span class="stk seal" style="bottom:150px;left:14px;width:52px;height:52px;color:var(--veneno);font-size:24px">13</span>
+            <div class="stk" style="top:120px;left:18px"><div class="pxheart" style="transform:scale(.8)"></div></div>
+            <div class="pbody" style="justify-content:center;text-align:center;align-items:center;gap:0">
+              <div style=";display:flex;align-items:center;gap:9px;margin-bottom:14px">
+                <div class="logoR" style="width:26px;height:26px"></div>
+                <span class="t-anton" style="color:var(--hueso);font-size:13px;letter-spacing:.3em">RESET</span>
+              </div>
+              <div class="t-drip" style="color:var(--sangre);font-size:150px;line-height:.8;text-shadow:0 5px 0 #000">13</div>
+              <div class="t-anton" style="color:var(--hueso);font-size:26px;margin-top:8px">TRECE AÑOS</div>
+              <p style="color:#b7ada6;font-size:14px;line-height:1.45;margin:16px 6px 0">Se vienen cositas.<br>Deja tu foto para la posteridad.</p>
+              <div class="btn" style="font-size:26px;width:100%;margin-top:24px">QUIERO IMPRIMIR</div>
+              <div style="margin-top:14px;font:400 12px 'Space Grotesk';color:#7a706c">Tienes <span class="t-pixel" style="color:var(--veneno);font-size:10px">2 FOTOS</span>, elígelas bien.</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">01 · Portada</figcaption>
+        </figure>
+
+        <!-- 2. ELEGIR FOTO -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <div class="pbody" style="gap:16px">
+              <div style="margin-top:6px"><span class="t-anton" style="color:var(--hueso);font-size:34px">TU FOTO,<br>TU LEYENDA</span></div>
+              <p style="color:#9a908a;font-size:13px;margin:-6px 0 6px">¿De dónde la sacamos?</p>
+              <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center">
+                <div style="border:3px solid var(--sangre);border-radius:6px;padding:26px 20px;background:#160f0e;display:flex;align-items:center;gap:16px;box-shadow:0 5px 0 #000">
+                  <div style="width:46px;height:38px;border:3px solid var(--hueso);border-radius:5px;position:relative;flex:none"><div style="position:absolute;width:14px;height:14px;border:3px solid var(--hueso);border-radius:50%;top:8px;left:12px"></div><div style="position:absolute;width:14px;height:6px;background:var(--hueso);top:-6px;left:12px;border-radius:3px 3px 0 0"></div></div>
+                  <div><div class="t-anton" style="color:var(--hueso);font-size:24px">TOMAR FOTO</div><div style="font:400 11px 'Space Grotesk';color:#8a807a">abre la cámara</div></div>
+                </div>
+                <div style="border:3px solid #3a2e2c;border-radius:6px;padding:26px 20px;background:#160f0e;display:flex;align-items:center;gap:16px">
+                  <div style="width:46px;height:38px;border:3px solid var(--hueso);border-radius:5px;position:relative;flex:none;overflow:hidden"><div style="position:absolute;width:14px;height:14px;border-radius:50%;background:var(--brasa);top:6px;left:6px"></div><div style="position:absolute;bottom:-2px;left:4px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:16px solid var(--hueso)"></div></div>
+                  <div><div class="t-anton" style="color:var(--hueso);font-size:24px">SUBIR DE GALERÍA</div><div style="font:400 11px 'Space Grotesk';color:#8a807a">de tu rollo</div></div>
+                </div>
+              </div>
+              <div style="text-align:center;font:400 11px 'Space Grotesk';color:#6a605c">Sin filtros raros. Tú y tu cara nomás.</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">02 · Elegir foto</figcaption>
+        </figure>
+
+        <!-- 3. RECORTE -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <div class="pbody" style="gap:14px">
+              <div style="text-align:center"><div class="t-anton" style="color:var(--hueso);font-size:22px">ENCUADRA</div><p style="color:#9a908a;font-size:12px;margin:4px 12px 0">Arrastra y pellizca. Lo que ves es lo que sale.</p></div>
+              <!-- crop stage -->
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+                <div style="position:relative;width:206px;aspect-ratio:2/3;border-radius:2px;overflow:hidden">
+                  <div class="ph face" style="position:absolute;inset:0"><div class="phl">foto del invitado</div></div>
+                  <!-- frame overlay window guides -->
+                  <div style="position:absolute;inset:0;box-shadow:inset 0 0 0 2px rgba(242,233,212,.85)"></div>
+                  <div style="position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.35),transparent 22%,transparent 78%,rgba(0,0,0,.55))"></div>
+                  <div class="t-anton" style="position:absolute;bottom:6px;left:0;right:0;text-align:center;color:#fff;font-size:11px;letter-spacing:.14em;text-shadow:0 1px 2px #000">13 AÑOS RESET</div>
+                  <!-- rule of thirds -->
+                  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:33.33% 33.33%;opacity:.5"></div>
+                </div>
+              </div>
+              <!-- zoom slider -->
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="t-pixel" style="color:#6a605c;font-size:9px">–</span>
+                <div style="flex:1;height:6px;background:#2a201f;border-radius:3px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:44%;background:var(--sangre);border-radius:3px"></div><div style="position:absolute;left:44%;top:50%;width:18px;height:18px;background:var(--hueso);border:2px solid #000;border-radius:50%;transform:translate(-50%,-50%)"></div></div>
+                <span class="t-pixel" style="color:var(--hueso);font-size:9px">+</span>
+              </div>
+              <div class="btn" style="font-size:22px">USAR ESTA FOTO</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">03 · Recorte (react-easy-crop, cover)</figcaption>
+        </figure>
+
+        <!-- 4. NOMBRE -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <span class="stk seal" style="top:70px;right:22px;width:48px;height:48px;color:var(--sangre);font-size:22px">13</span>
+            <div class="pbody" style="gap:14px">
+              <div style="margin-top:14px"><span class="t-anton" style="color:var(--hueso);font-size:32px">¿QUIÉN ERES?</span></div>
+              <p style="color:#9a908a;font-size:13px;margin:-4px 0 10px">Va impreso en tu foto y sirve para encontrarla en la mesa.</p>
+              <div style="position:relative"><input class="inp" placeholder="Tu nombre o tu chapa"><span class="t-marker" style="position:absolute;right:12px;top:-14px;color:var(--brasa);font-size:16px;transform:rotate(-6deg)">¡con estilo!</span></div>
+              <div style="display:flex;justify-content:space-between;font:400 11px 'Space Grotesk';color:#6a605c"><span>Opcional, pero recomendado.</span><span class="t-pixel" style="font-size:8px">0/18</span></div>
+              <div style="flex:1"></div>
+              <div style="border:2px dashed #3a2e2c;border-radius:5px;padding:12px 14px;color:#8a807a;font-size:12px;line-height:1.4">Se imprime chiquito abajo del marco, en <span class="t-anton" style="color:var(--hueso);letter-spacing:.05em">MAYÚSCULAS</span>.</div>
+              <div class="btn" style="font-size:22px">SIGUIENTE</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">04 · Nombre / chapa</figcaption>
+        </figure>
+
+        <!-- 5. CONFIRMACIÓN -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <div class="pbody" style="gap:12px">
+              <div style="text-align:center"><span class="t-anton" style="color:var(--hueso);font-size:22px">ASÍ SE VA A IMPRIMIR</span></div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+                <div class="pframe" style="width:178px;box-shadow:0 14px 30px -12px #000">
+                  <div class="fr-top"><span class="t-anton" style="color:#fff;font-size:10px;letter-spacing:.34em">13 AÑOS</span></div>
+                  <div class="win"><div class="ph face" style="position:absolute;inset:0"><div class="phl">foto</div></div></div>
+                  <div class="fr-bot"><div class="logoR" style="width:11px;height:11px;flex:none"></div><span class="t-anton" style="color:#fff;font-size:12px;letter-spacing:.04em">MAJO CH.</span></div>
+                  <span class="stk seal" style="top:3px;right:6px;width:22px;height:22px;color:var(--sangre);font-size:11px">13</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;background:#160f0e;border:1.5px solid #3a2e2c;border-radius:4px;padding:9px 12px">
+                <span class="t-pixel" style="color:var(--brasa);font-size:9px">!</span>
+                <span style="font:400 11px 'Space Grotesk';color:#b7ada6">Esto usa <b style="color:var(--hueso)">1 de tus 2 fotos</b>. No hay vuelta.</span>
+              </div>
+              <div class="btn" style="font-size:22px">ENVIAR A IMPRIMIR</div>
+              <div class="btn gh" style="font-size:15px;padding:10px">Volver a encuadrar</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">05 · Confirmación</figcaption>
+        </figure>
+
+        <!-- 6. ÉXITO -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="halftone" style="position:absolute;inset:0;opacity:.55"></div>
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <div class="pbody" style="justify-content:center;align-items:center;text-align:center;gap:0">
+              <div class="seal" style="width:150px;height:150px;color:var(--veneno);border-width:4px;position:relative">
+                <div style="display:flex;flex-direction:column;align-items:center"><span style="font-size:20px;letter-spacing:.1em">EN LA</span><span style="font-size:34px;line-height:.8">COLA</span></div>
+              </div>
+              <div class="t-anton" style="color:var(--hueso);font-size:30px;margin-top:26px">¡LISTO!</div>
+              <p style="color:#b7ada6;font-size:14px;line-height:1.45;margin:10px 12px 0">Tu foto ya está en la cola de impresión.<br>Recógela en la mesa en un toque.</p>
+              <div style="margin-top:22px;border:2px solid #2a201f;border-radius:4px;padding:10px 16px">Te queda <span class="t-pixel" style="color:var(--veneno);font-size:13px">1 FOTO</span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">06 · Éxito</figcaption>
+        </figure>
+
+        <!-- 7. LÍMITE -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+        <div class="phone">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <span class="stk ball8" style="top:80px;left:24px"><i>8</i></span>
+            <div class="pbody" style="justify-content:center;align-items:center;text-align:center;gap:0">
+              <div class="t-pixel" style="color:var(--sangre);font-size:44px;line-height:1.2;animation:flick 3s infinite">0/2</div>
+              <div class="t-creep" style="color:var(--hueso);font-size:52px;line-height:.9;margin-top:14px">se acabó</div>
+              <div class="t-anton" style="color:var(--sangre);font-size:30px;margin-top:6px">VE POR UN TRAGO</div>
+              <p style="color:#b7ada6;font-size:14px;line-height:1.45;margin:16px 16px 0">Ya quemaste tus 2 fotos, crack.<br>Anda a la mesa a recogerlas.</p>
+              <div class="btn gh" style="font-size:14px;padding:10px 18px;margin-top:24px">Ver la cola</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">07 · Límite alcanzado</figcaption>
+        </figure>
+
+      </div>
+    </div>
+
+    <!-- ===================== ESTADOS DE SISTEMA ===================== -->
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Estados: subiendo · error · sin conexión</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <!-- subiendo -->
+        <div style="width:230px;background:var(--tinta);border:3px solid #000;border-radius:22px;padding:26px 22px;position:relative;overflow:hidden" class="grain">
+          <div class="t-anton" style="color:var(--hueso);font-size:20px">MANDANDO A LA COLA</div>
+          <p style="color:#8a807a;font-size:12px;margin:6px 0 16px">No cierres. Ya casi.</p>
+          <div class="pbar"><i></i></div>
+          <div class="t-pixel" style="color:var(--brasa);font-size:9px;margin-top:12px">64%</div>
+        </div>
+        <!-- error -->
+        <div style="width:230px;background:var(--tinta);border:3px solid var(--sangre);border-radius:22px;padding:26px 22px;position:relative;overflow:hidden" class="grain">
+          <div class="t-creep" style="color:var(--sangre);font-size:30px">se cayó</div>
+          <div class="t-anton" style="color:var(--hueso);font-size:18px;margin-top:2px">LA SUBIDA</div>
+          <p style="color:#8a807a;font-size:12px;margin:8px 0 16px">La foto no llegó. Cosas del wifi de evento.</p>
+          <div class="btn" style="font-size:16px;padding:12px">REINTENTAR</div>
+        </div>
+        <!-- offline -->
+        <div style="width:230px;background:var(--tinta);border:3px dashed #3a2e2c;border-radius:22px;padding:26px 22px;position:relative;overflow:hidden" class="grain">
+          <div class="t-pixel" style="color:#6a605c;font-size:11px;line-height:1.6">·· NO ··<br>SIGNAL</div>
+          <div class="t-anton" style="color:var(--hueso);font-size:18px;margin-top:12px">SIN CONEXIÓN</div>
+          <p style="color:#8a807a;font-size:12px;margin:8px 0 16px">Acércate al DJ, ahí llega mejor.</p>
+          <div class="btn gh" style="font-size:14px;padding:10px">Reintentar</div>
+        </div>
+        <!-- low-res warning -->
+        <div style="width:230px;background:var(--tinta);border:3px solid var(--brasa);border-radius:22px;padding:26px 22px;position:relative;overflow:hidden" class="grain">
+          <span class="tag" style="color:var(--brasa);border-color:var(--brasa)">baja calidad</span>
+          <div class="t-anton" style="color:var(--hueso);font-size:18px;margin-top:12px">ESTÁ PIXELEADA</div>
+          <p style="color:#8a807a;font-size:12px;margin:8px 0 16px">Puede salir con poca calidad. ¿Igual la mandas?</p>
+          <div class="btn" style="font-size:15px;padding:11px;background:var(--brasa);box-shadow:0 5px 0 #000,0 5px 0 2px #b93d18">Igual mándala</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dv-secdiv"></div>
+    <div class="dv-sechd" style="width:100%">Panel de operador · Marco de impresión</div>
+
+    <!-- ===================== PANEL OPERADOR ===================== -->
+    <div class="dv-opt" id="1d">
+      <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Panel de operador (con clave)</div>
+      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+        <!-- login -->
+        <div class="phone" style="height:520px">
+          <div class="scr grain">
+            <div class="statusbar"><span>13:13</span><span class="dots">••• ▮</span></div>
+            <div class="pbody" style="justify-content:center;gap:16px">
+              <div style="text-align:center"><div class="logoR" style="width:34px;height:34px;margin:0 auto 10px"></div><div class="t-anton" style="color:var(--hueso);font-size:24px">PANEL DE COLA</div><div class="t-pixel" style="color:var(--sangre);font-size:9px;margin-top:8px">SOLO STAFF</div></div>
+              <input class="inp" placeholder="Clave del evento" style="text-align:center;letter-spacing:.3em" value="••••">
+              <div class="btn" style="font-size:20px">ENTRAR</div>
+            </div>
+          </div>
+        </div>
+        <!-- queue -->
+        <div style="width:344px;background:var(--tinta);border:3px solid #000;border-radius:14px;overflow:hidden;position:relative" class="grain">
+          <div style="padding:16px 18px;border-bottom:2px solid #2a201f;display:flex;justify-content:space-between;align-items:center">
+            <div class="t-anton" style="color:var(--hueso);font-size:20px">COLA EN VIVO</div>
+            <div style="text-align:right"><div class="t-pixel" style="color:var(--veneno);font-size:9px">PAPEL 32/40</div><div style="font:400 9px 'Space Grotesk';color:#6a605c">quedan 8 hojas</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <!-- imprimiendo -->
+            <div style="display:flex;gap:12px;padding:13px 16px;align-items:center;background:#170f0e;border-left:3px solid var(--brasa)">
+              <div class="ph face" style="width:38px;height:57px;border-radius:2px;flex:none"></div>
+              <div style="flex:1;min-width:0"><div style="color:var(--hueso);font-weight:700;font-size:14px">MAJO CH.</div><div class="t-pixel" style="color:var(--brasa);font-size:8px;margin-top:3px">IMPRIMIENDO…</div></div>
+              <div class="btn gh" style="padding:7px 10px;font-size:12px">saltar</div>
+            </div>
+            <!-- en cola -->
+            <div style="display:flex;gap:12px;padding:13px 16px;align-items:center;border-top:1px solid #221a19">
+              <div class="ph face" style="width:38px;height:57px;border-radius:2px;flex:none"></div>
+              <div style="flex:1;min-width:0"><div style="color:var(--hueso);font-weight:700;font-size:14px">EL FLACO</div><div style="font:400 10px 'Space Grotesk';color:#8a807a;margin-top:3px">en cola · #2</div></div>
+              <div class="btn gh" style="padding:7px 10px;font-size:12px">saltar</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:13px 16px;align-items:center;border-top:1px solid #221a19">
+              <div class="ph face" style="width:38px;height:57px;border-radius:2px;flex:none"></div>
+              <div style="flex:1;min-width:0"><div style="color:var(--hueso);font-weight:700;font-size:14px">DRA. ROSA</div><div style="font:400 10px 'Space Grotesk';color:#8a807a;margin-top:3px">en cola · #3</div></div>
+              <div class="btn gh" style="padding:7px 10px;font-size:12px">saltar</div>
+            </div>
+            <!-- listo -->
+            <div style="display:flex;gap:12px;padding:13px 16px;align-items:center;border-top:1px solid #221a19;opacity:.72">
+              <div class="ph face" style="width:38px;height:57px;border-radius:2px;flex:none;position:relative"><div style="position:absolute;inset:0;background:rgba(75,212,74,.12)"></div></div>
+              <div style="flex:1;min-width:0"><div style="color:var(--hueso);font-weight:700;font-size:14px">PIPO</div><div class="t-pixel" style="color:var(--veneno);font-size:8px;margin-top:3px">LISTO ✓</div></div>
+              <div class="btn gh" style="padding:7px 10px;font-size:12px;border-color:var(--veneno);color:var(--veneno)">reimprimir</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MARCO DE IMPRESIÓN + VARIACIONES ===================== -->
+    <div class="dv-opt" id="1e">
+      <div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Marco de impresión · 2:3 · negro o rojo · stickers random por foto</div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+        <!-- black A -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+          <div class="pframe">
+            <div class="fr-top"><span class="t-anton" style="color:#fff;font-size:13px;letter-spacing:.36em">13 AÑOS</span></div>
+            <div class="win"><div class="ph face" style="position:absolute;inset:0"><div class="phl">foto del invitado</div></div></div>
+            <div class="fr-bot"><div class="logoR" style="width:15px;height:15px;flex:none"></div><span class="t-anton" style="color:#fff;font-size:14px;letter-spacing:.05em">MAJO CH.</span></div>
+            <span class="stk seal" style="top:3px;right:8px;width:30px;height:30px;color:var(--sangre);font-size:14px">13</span>
+            <div class="stk ball8" style="bottom:70px;left:7px;width:26px;height:26px"><i style="width:11px;height:11px;font-size:7px">8</i></div>
+          </div>
+          <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">Negro · stickers random (8 + 13)</figcaption>
+        </figure>
+        <!-- black B -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+          <div class="pframe">
+            <div class="fr-top"><span class="t-anton" style="color:#fff;font-size:13px;letter-spacing:.36em">13 AÑOS</span></div>
+            <div class="win"><div class="ph face" style="position:absolute;inset:0"><div class="phl">foto del invitado</div></div></div>
+            <div class="fr-bot"><div class="logoR" style="width:15px;height:15px;flex:none"></div><span class="t-anton" style="color:#fff;font-size:14px;letter-spacing:.05em">EL FLACO</span></div>
+            <div class="stk" style="top:6px;left:9px"><div class="pxheart" style="transform:scale(.6)"></div></div>
+            <div class="stk ball8" style="top:5px;right:9px;width:26px;height:26px"><i style="width:11px;height:11px;font-size:7px">8</i></div>
+          </div>
+          <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">Negro · misma plantilla, stickers distintos</figcaption>
+        </figure>
+        <!-- red -->
+        <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+          <div class="pframe" style="background:var(--sangre)">
+            <div class="fr-top"><span class="t-anton" style="color:#fff;font-size:13px;letter-spacing:.36em">13 AÑOS</span></div>
+            <div class="win"><div class="ph face" style="position:absolute;inset:0"><div class="phl">foto del invitado</div></div></div>
+            <div class="fr-bot"><div class="logoR" style="width:15px;height:15px;flex:none"></div><span class="t-anton" style="color:#fff;font-size:14px;letter-spacing:.05em">DRA. ROSA</span></div>
+            <span class="stk seal" style="top:3px;left:8px;width:30px;height:30px;color:#fff;font-size:14px">13</span>
+            <div class="stk" style="bottom:68px;right:8px"><div class="pxheart" style="transform:scale(.6);filter:brightness(0) invert(1)"></div></div>
+          </div>
+          <figcaption style="font:500 11px 'Space Grotesk';color:#8a807a">Rojo · stickers en blanco</figcaption>
+        </figure>
+      </div>
+    </div>
+
+  <p class="dv-next">Dime hacia dónde: · "el prototipo interactivo con el recorte funcionando, base <a class="dv-oid" href="#1b">1b</a>" · "el marco <a class="dv-oid" href="#1e">1e</a> pero solo negro" · "más stickers random en el marco" · "ajusta la portada"</p>
+</section>
+</x-dc>
+</body>
+</html>

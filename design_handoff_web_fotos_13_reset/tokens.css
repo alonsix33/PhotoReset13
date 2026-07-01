@@ -1,0 +1,67 @@
+/* ============================================================
+   13 AÑOS RESET — Design tokens (tema de fiesta, no corporativo)
+   Handoff para Claude Code. Todo mobile-first.
+   ============================================================ */
+
+:root{
+  /* ---- Color ---- */
+  --tinta:   #120E0E;  /* fondo base, casi negro cálido — el lienzo */
+  --tinta-2: #1B1514;  /* elevación / glow sutil */
+  --sangre:  #D21F1F;  /* rojo dominante — CTAs, títulos, acentos */
+  --sangre-2:#A81414;  /* sombra dura / estado active del rojo */
+  --hueso:   #F2E9D4;  /* crema papel — texto e íconos sobre tinta */
+  --hueso-d: #D8CDB2;  /* hueso apagado, texto secundario */
+  --veneno:  #4BD44A;  /* verde tóxico — éxito, chispas (escaso) */
+  --brasa:   #F0552A;  /* naranja horror — alertas suaves (escaso) */
+  --linea:   #3A2E2C;  /* bordes / divisores sobre tinta */
+  --texto-2: #9A908A;  /* texto atenuado */
+  --texto-3: #6A605C;  /* notas / captions */
+
+  /* ---- Tipografía (Google Fonts) ---- */
+  --f-impacto: "Anton", sans-serif;          /* titulares, CTAs, números */
+  --f-cuerpo:  "Space Grotesk", sans-serif;  /* TODO texto de lectura y UI */
+  --f-horror:  "Creepster", cursive;         /* 1-2 palabras, sellos */
+  --f-drip:    "Rubik Wet Paint", cursive;   /* solo el "13" del hero */
+  --f-plumon:  "Permanent Marker", cursive;  /* floreos al margen */
+  --f-pixel:   "Press Start 2P", monospace;  /* micro dosis: contadores, badges */
+
+  /* Escala de tipo (mobile). Saltos grandes, nunca 400 vs 600. */
+  --t-hero:    150px;  /* "13" drip */
+  --t-display: 34px;   /* Anton títulos de pantalla */
+  --t-title:   22px;   /* Anton subtítulos */
+  --t-body:    14px;   /* cuerpo */
+  --t-small:   12px;   /* notas */
+  --t-micro:   9px;    /* pixel / captions */
+  --lh-tight:  0.92;
+  --lh-body:   1.45;
+
+  /* ---- Espaciado ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 22px; --s-6: 26px; --s-8: 40px;
+  --pad-screen: 26px;      /* padding lateral de pantalla */
+  --hit: 48px;             /* target táctil mínimo */
+
+  /* ---- Formas ---- */
+  --r-btn: 5px;  --r-card: 6px;  --r-phone: 42px;
+  --bd: 3px solid #000;                       /* borde tattoo */
+  --shadow-btn: 0 5px 0 #000, 0 5px 0 2px var(--sangre-2);
+  --shadow-card: 0 16px 34px -14px rgba(0,0,0,.9);
+
+  /* ---- Marco de impresión ---- */
+  --marco-ratio: 2 / 3;    /* 1200 × 1800 px @300dpi (4"×6") */
+  --marco-color-a: var(--tinta);   /* negro */
+  --marco-color-b: var(--sangre);  /* rojo — random por foto */
+  /* bordes del marco (sobre 1200px): lados 90, arriba 120, abajo 150 */
+}
+
+/* Texturas obligatorias (rompen el look de IA):
+   - grano: overlay feTurbulence, opacity ~0.11, mix-blend-mode: overlay
+   - semitono: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1.6px) 7px
+   Nunca dejar que la textura baje la legibilidad del texto funcional. */
+
+/* Reglas de uso:
+   - El cuerpo SIEMPRE es Space Grotesk. Lo demás es sabor, dosificado.
+   - Máx 2 fuentes de display por pantalla.
+   - El rojo manda; veneno y brasa con cuentagotas.
+   - Stickers (bola 8, sello 13, corazón pixel) van en bordes, nunca sobre texto/controles.
+   - El marco solo va en negro o rojo. Stickers random por foto. */
