@@ -140,6 +140,36 @@ function heartAt(x: CanvasRenderingContext2D, cell: number, col: string) {
       if (rows[r][c] === '1') x.fillRect(ox + c * cell, oy + r * cell, cell - 1, cell - 1)
 }
 
+// Dibuja un PNG con un contorno "die-cut" hueso (como sticker recortado), para
+// que se lea sobre marco rojo O negro sin perder las partes del mismo color.
+// El contexto ya viene trasladado/rotado al centro del sticker.
+const RIM = 6 // px de contorno sobre el lienzo 1200
+function drawPngWithRim(
+  x: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  w: number,
+  h: number,
+) {
+  const pad = Math.ceil(RIM) + 2
+  const oc = document.createElement('canvas')
+  oc.width = Math.ceil(w) + pad * 2
+  oc.height = Math.ceil(h) + pad * 2
+  const o = oc.getContext('2d')!
+  o.drawImage(img, pad, pad, w, h)
+  // Silueta hueso a partir del alpha.
+  o.globalCompositeOperation = 'source-in'
+  o.fillStyle = '#F2E9D4'
+  o.fillRect(0, 0, oc.width, oc.height)
+  // Estampar la silueta en un anillo para formar el contorno.
+  const N = 16
+  for (let i = 0; i < N; i++) {
+    const a = (i / N) * Math.PI * 2
+    x.drawImage(oc, -w / 2 - pad + Math.cos(a) * RIM, -h / 2 - pad + Math.sin(a) * RIM)
+  }
+  // Arte original encima.
+  x.drawImage(img, -w / 2, -h / 2, w, h)
+}
+
 export interface WinGeom {
   wx: number
   wy: number
@@ -181,16 +211,18 @@ export function drawStickers(
     // "Sangrado": el sticker cruza el borde de la ventana y queda parte sobre el
     // marco, parte sobre la foto. Se acota al ancho del borde (no salir del
     // lienzo) y hacia abajo se sangra menos para no acercarse al nombre.
-    const bleedX = Math.min(0.3 * (hw * 2), g.bl - SAFE, g.br - SAFE)
-    const bleedTop = Math.min(0.3 * (hh * 2), g.bt - SAFE)
-    const bleedBot = Math.min(0.18 * (hh * 2), g.bb - SAFE, 45)
+    // Sangrado moderado: cruzan el filo pero quedan mayormente sobre la foto
+    // (clara), donde el contraste es bueno. El contorno hueso cubre el resto.
+    const bleedX = Math.min(0.2 * (hw * 2), g.bl - SAFE, g.br - SAFE, 52)
+    const bleedTop = Math.min(0.18 * (hh * 2), g.bt - SAFE, 52)
+    const bleedBot = Math.min(0.13 * (hh * 2), g.bb - SAFE, 38)
     const cx = isLeft ? g.wx + hw - bleedX : g.wx + g.ww - hw + bleedX
     const cy = isTop ? g.wy + hh - bleedTop : g.wy + g.wh - hh + bleedBot
     x.save()
     x.translate(cx, cy)
     x.rotate((p.rot * Math.PI) / 180)
     if (p.kind === 'png' && img) {
-      x.drawImage(img, -hw, -hh, hw * 2, hh * 2)
+      drawPngWithRim(x, img, hw * 2, hh * 2)
     } else if (p.kind === 'seal') {
       sealAt(x, p.size, col)
     } else if (p.kind === 'ball') {
