@@ -37,10 +37,14 @@ const WH = 1498 // alto de la ventana (fondo de ventana en 1626; borde inferior 
 const WIN_W = OUT_W - BS * 2 // 1020
 // Proporción del recorte = proporción de la ventana (evita distorsión).
 export const CROP_ASPECT = WIN_W / WH // ≈ 0.681
-// Centros verticales del texto. Margen a los filos ~5mm (sobre el overscan
-// de ~2mm): título arriba ~62px del filo, nombre ~64px del filo.
-const TITLE_Y = 98 // "13 AÑOS" (76px Anton → ~62..126, sobre la ventana en 128)
-const NAME_Y = OUT_H - 92 // 1684 → logo/nombre ~1655..1714 (bajo ventana en 1626)
+// Bandas del marco donde van los textos (entre el filo del lienzo y el borde de
+// la ventana): superior [0, WY], inferior [WY+WH, OUT_H]. El texto se CENTRA en
+// su banda con métricas reales (measureText) y nunca toca el borde de la foto:
+// se garantiza un colchón mínimo (TEXT_CUSHION) entre el texto y la ventana.
+const TEXT_CUSHION = 14 // px mínimos entre el texto y el borde de la foto
+const LOGO_W = 58 // lado del logo R en el bloque inferior
+const NAME_FONT = 60 // px, Anton, del nombre
+const TITLE_FONT = 76 // px, Anton, del "13 AÑOS"
 
 // Coordenadas del recorte en px de la imagen original (= croppedAreaPixels).
 export interface CropArea {
@@ -175,29 +179,47 @@ export async function composePrint(params: ComposeParams): Promise<ComposeResult
   x.lineWidth = 4
   x.strokeRect(wx - 8, wy - 8, ww + 16, wh + 16)
 
-  // "13 AÑOS" arriba (Anton, tracking), dentro de la zona segura.
+  // Bandas del marco (entre filo del lienzo y borde de la ventana).
+  const topBandBottom = wy // 128
+  const botBandTop = wy + wh // 1626
+
+  // --- "13 AÑOS" centrado en la banda SUPERIOR por métricas reales ---
   x.fillStyle = '#F2E9D4'
   x.textAlign = 'center'
-  x.textBaseline = 'middle'
+  x.textBaseline = 'alphabetic'
   setLetterSpacing(x, '26px')
-  x.font = '400 76px "Anton", sans-serif'
-  x.fillText('13 AÑOS', OUT_W / 2 + 13, TITLE_Y)
+  x.font = `400 ${TITLE_FONT}px "Anton", sans-serif`
+  const tm = x.measureText('13 AÑOS')
+  const tAsc = tm.actualBoundingBoxAscent // tinta encima de la baseline
+  const tDesc = tm.actualBoundingBoxDescent // tinta debajo
+  // Centrar la tinta en [0, topBandBottom]: baseline = (B + asc - desc)/2, con
+  // baseline='alphabetic' → inkTop=baseline-asc, inkBottom=baseline+desc quedan
+  // a igual distancia del filo y del borde de la ventana. Colchón garantizado.
+  let titleBaseline = (topBandBottom + tAsc - tDesc) / 2
+  if (titleBaseline + tDesc > topBandBottom - TEXT_CUSHION) {
+    titleBaseline = topBandBottom - TEXT_CUSHION - tDesc
+  }
+  x.fillText('13 AÑOS', OUT_W / 2 + 13, titleBaseline)
   setLetterSpacing(x, '0px')
 
-  // Logo R + nombre en una línea abajo, dentro de la zona segura.
+  // --- Logo R + nombre centrados en la banda INFERIOR ---
   const upper = (name || '').toUpperCase()
-  x.font = '400 60px "Anton", sans-serif'
+  x.textBaseline = 'middle'
+  x.font = `400 ${NAME_FONT}px "Anton", sans-serif`
   const nameW = upper ? x.measureText(upper).width : 0
-  const lw = 58
+  const lw = LOGO_W
   const gap = upper ? 18 : 0
   const total = lw + gap + nameW
-  const by = NAME_Y
+  // Centro vertical del bloque = centro de la banda inferior; el logo (el
+  // elemento más alto) manda el colchón a la ventana.
+  let by = (botBandTop + OUT_H) / 2
+  if (by - lw / 2 < botBandTop + TEXT_CUSHION) by = botBandTop + TEXT_CUSHION + lw / 2
   const cx = OUT_W / 2 - total / 2
   if (logo) x.drawImage(logo, cx, by - lw / 2, lw, lw)
   if (upper) {
     x.textAlign = 'left'
     x.fillStyle = '#F2E9D4'
-    x.fillText(upper, cx + lw + gap, by + 2)
+    x.fillText(upper, cx + lw + gap, by)
   }
 
   // Punto crítico #3: hornear exactamente los stickers ya decididos. Montan el
