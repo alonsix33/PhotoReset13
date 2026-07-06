@@ -343,7 +343,7 @@ export default function GuestApp() {
               </span>
             </div>
             <p style={{ color: '#9a908a', fontSize: 13, margin: '-4px 0 4px' }}>
-              ¿De dónde la sacamos?
+              Sube tu mejor foto del rollo.
             </p>
             <div
               style={{
@@ -364,67 +364,6 @@ export default function GuestApp() {
                   alignItems: 'center',
                   gap: 16,
                   boxShadow: '0 5px 0 #000',
-                  cursor: 'pointer',
-                }}
-              >
-                <div
-                  style={{
-                    width: 46,
-                    height: 38,
-                    border: '3px solid var(--hueso)',
-                    borderRadius: 5,
-                    position: 'relative',
-                    flex: 'none',
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      width: 14,
-                      height: 14,
-                      border: '3px solid var(--hueso)',
-                      borderRadius: '50%',
-                      top: 8,
-                      left: 12,
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      width: 14,
-                      height: 6,
-                      background: 'var(--hueso)',
-                      top: -6,
-                      left: 12,
-                      borderRadius: '3px 3px 0 0',
-                    }}
-                  />
-                </div>
-                <div>
-                  <div className="t-anton" style={{ color: 'var(--hueso)', fontSize: 24 }}>
-                    TOMAR FOTO
-                  </div>
-                  <div style={{ font: "400 11px 'Space Grotesk'", color: '#8a807a' }}>
-                    abre la cámara
-                  </div>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={onFile}
-                  style={{ display: 'none' }}
-                />
-              </label>
-              <label
-                style={{
-                  border: '3px solid var(--linea)',
-                  borderRadius: 6,
-                  padding: '24px 20px',
-                  background: '#160f0e',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16,
                   cursor: 'pointer',
                 }}
               >
