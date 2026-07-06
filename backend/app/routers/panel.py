@@ -97,7 +97,12 @@ def download_all():
     """Respaldo: descarga TODAS las fotos guardadas en un zip. Los PNG ya vienen
     comprimidos, así que el zip solo los empaqueta (ZIP_STORED, rápido y sin CPU).
     Cada archivo se nombra por orden de llegada + nombre + id corto, para ubicarlo.
-    No borra nada; es solo lectura."""
+    No borra nada; es solo lectura.
+
+    Nota de memoria: arma el zip completo en RAM (pico ~2× el total de bytes de
+    fotos). Es una llamada ocasional del staff, no de invitados ni de la ruta
+    caliente, así que es un trade-off aceptable; con miles de fotos convendría
+    streamear a archivo temporal."""
     jobs = sorted(models.list_jobs(), key=lambda j: j["created_at"])
     buf = io.BytesIO()
     included = 0
